@@ -56,11 +56,78 @@ class Decoder(nn.Module):
                 x = x + skip_con[sk_len-(idx+1)]
         return x
 
-dummy = torch.randn((1, 32, 128, 128))
-encoder = Encoder()
-decoder = Decoder()
+class FusionNet(nn.Module):
+    def __init__(self, channel):
+        super(FusionNet, self).__init__()
+        self.net = nn.Sequential(
+            net.ConvBatchBlock(channel, 256, 3, stride=1, padding=1),
+            nn.ReLU(inplace=True),
+            net.ConvBatchBlock(256, 128, 3, stride=1, padding=1),
+            nn.ReLU(inplace=True),
+            net.ConvBatchBlock(128, 128, 3, stride=1, padding=1),
+            nn.ReLU(inplace=True),
+            net.ConvBatchBlock(128, 64, 3, stride=1, padding=1),
+            nn.ReLU(inplace=True),
+            net.ConvBatchBlock(64, 256, 3, stride=1, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 1, 3, stride=1, padding=1),
+            nn.Tanh()
+        )
+    def forward(self, input):
+        return self.net(input)
+
+class MattingNet(nn.Module):
+    def __init__(self, basic_channel):
+        super(MattingNet, self).__init__()
+        self.FeatureExtractor = nn.Sequential(
+            net.ConvBatchBlock(3, 64, 3, stride=1, padding=1),
+            nn.ReLU(inplace=True),
+            net.ConvBatchBlock(64, 128, 3, stride=1, padding=1),
+            nn.ReLU(inplace=True)
+        )
+        self.Encoder = nn.ModuleList([])
+        extractor = nn.Sequential(
+            net.ConvBatchBlock(3, basic_channel, 3, stride=1, padding=1),
+            nn.ReLU(inplace=True)
+        )
+        self.Encoder.append(extractor)
+        encoder = Encoder(basic_channel=basic_channel)
+        self.Encoder.append(encoder)
+        self.Decoder1 = Decoder(basic_channel=basic_channel)
+        self.lastConv1 = nn.Sequential(
+            nn.Conv2d(basic_channel, 1, 3, stride=1, padding=1),
+            nn.Tanh()
+        )
+        self.Decoder2 = Decoder(basic_channel=basic_channel)
+        self.lastConv2 = nn.Sequential(
+            nn.Conv2d(basic_channel, 1, 3, stride=1, padding=1),
+            nn.Tanh()
+        )
+        self.FusionNet = FusionNet(128+(basic_channel*2))
+    def forward(self, input):
+        feature = self.FeatureExtractor(input)#피쳐 뽑아냄
+        first_layer = self.Encoder[0](input)
+        e_feature, skip_connection = self.Encoder[1](first_layer)
+        fg_feature = self.Decoder1(e_feature, skip_connection)
+        fg = self.lastConv1(fg_feature)
+        bg_feature = self.Decoder2(e_feature, skip_connection)
+        bg = self.lastConv2(bg_feature)
+
+        cat_feature = torch.cat([feature, fg_feature, bg_feature],dim=1)
+        result = self.FusionNet(cat_feature)
+        return result, fg, bg
+
+#forwarding Test
+dummy = torch.randn((1, 3, 256, 256))
+matting_net = MattingNet(basic_channel=64)
+result, fg, bg = matting_net(dummy)
+print(result.shape)
+'''
+encoder = Encoder(basic_channel=64)
+decoder = Decoder(basic_channel=64)
 result, list = encoder(dummy)
 print(result.shape, 'result shape')
 print(list[0].shape, 'first shape')
 result = decoder(result, list)
 print(result.shape, 'final result')
+'''
