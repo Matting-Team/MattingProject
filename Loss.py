@@ -14,11 +14,11 @@ def L2loss(x1, x2):
 #######################################
 ###########probability_Loss############
 #######################################
-def probability(gt, predict):
+def probability(predict, gt):
     l1_result = torch.abs(predict-gt)
     l2_result = (gt - predict)**2
-    mask_1 = (gt == -1) | (gt == 1)
-    mask_2 = (gt < 1) & (gt > -1)
+    mask_1 = (predict == 0) | (predict == 1)
+    mask_2 = (predict < 1) & (predict > -0)
     result = torch.masked_select(l1_result, mask_2).mean() + torch.masked_select(l2_result, mask_1).mean()
     return result.mean()
 
@@ -44,3 +44,13 @@ def gradientLoss(predict, gt):
 #######################################
 ###########cross entropy Loss##########
 #######################################
+
+
+#######################################
+###########p_loss_fusion net###########
+#######################################
+def fusionLoss(predict, gt):
+    l1_result = torch.abs(predict-gt)
+    l1_weighted = l1_result*0.1
+    loss = torch.where((gt>0 )& (gt<1), l1_result, l1_weighted)
+    return loss.mean()

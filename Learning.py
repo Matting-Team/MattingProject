@@ -66,7 +66,25 @@ if __name__ == '__main__':
             blend = blend*0.5+0.5
             fg = fg*0.5+0.5
             bg = bg*0.5+0.5
-            alpha=blend*fg + (1-blend)*(-bg)
+            alpha=blend*fg + (1-blend)*(1-bg)
 
-            l1_loss = loss.L1Loss(alpha, gt)
+            p_loss = loss.probability(fg, gt)
+            g_loss = loss.gradientLoss(fg, gt)
+            bce_loss = criterion(fg, gt)
+            fusion_loss = loss.fusionLoss(alpha, gt)
+            current_loss = p_loss+g_loss+bce_loss+fusion_loss
+            total_loss+=current_loss
+
+            optimizer.zero_grad()
+            current_loss.backward()
+            optimizer.step()
+            if idx%300==299:
+                print("|__idx_is__%d__|__loss is %f__|"%(idx, total_loss/300))
+                total_loss=0.
+                print_img(alpha)
+                print_img(gt)
+                print_img(fg)
+                print_img(bg)
+                print_img(blend)
+
 
