@@ -19,8 +19,11 @@ def probability(predict, gt):
     l2_result = (gt - predict)**2
     mask_1 = (predict == 0) | (predict == 1)
     mask_2 = (predict < 1) & (predict > -0)
-    result = torch.masked_select(l1_result, mask_2).mean() + torch.masked_select(l2_result, mask_1).mean()
-    return result.mean()
+    result = torch.masked_select(l1_result, mask_2).mean()
+    l2 = torch.masked_select(l2_result, mask_1).mean()
+    if not torch.isnan(l2):
+        result = result+l2
+    return result
 
 #######################################
 ###########gradient Loss###############
