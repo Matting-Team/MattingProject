@@ -32,7 +32,6 @@ class TotalNet(nn.Module):
         segment, segment_8, [feature_2, feature_4] = self.segmentNet(img)
         detail, detail_feature_2 = self.detailNet(img, feature_2, feature_4, segment_8)
         alpha = self.fusion(img, segment_8, detail_feature_2)
-
         return segment, detail, alpha
 
     def _init_conv(self, conv):
@@ -45,6 +44,14 @@ class TotalNet(nn.Module):
         if norm.weight is not None:
             nn.init.constant_(norm.weight, 1)
             nn.init.constant_(norm.bias, 0)
+
+    def freeze_norm(self):
+        norm_types = [nn.BatchNorm2d, nn.InstanceNorm2d]
+        for m in self.modules():
+            for n in norm_types:
+                if isinstance(m, n):
+                    m.eval()
+                    continue
 
 class Discriminator(nn.Module):
     def __init__(self, input_c):
@@ -66,11 +73,3 @@ class Discriminator(nn.Module):
     def forward(self, x):
         return torch.sigmoid(self.model(x))
 
-'''
-aa= torch.randn(1, 3, 256, 256)
-network = TotalNet()
-resulta ,b, c = network(aa)
-print(resulta.shape,'resulta') #seg
-print(b.shape,'bbb') #detail
-print(c.shape,'ccc') #alpha
-'''
