@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PREDICT</title>
+
+    <link rel="stylesheet" href="../static/CSS/layout.css?ver=1">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Playfair Display', serif !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class = "header">
+        <h1>DEEP IMAGE MATTING</h1>
+        <p>Gachon Univ. Software Graduation Project</p>
+    </div>
+
+    <div class = "topnav">
+        <a href = "/">HOME</a>
+        <a href = "/upload">UPLOAD</a>
+        <a href = "/predict">PREDICT</a>
+        <a href = "/contact">ABOUT US</a>
+    </div>
+
+    <div class = "main">
+        <h2>PREDICT CONTENT</h2>
+        <hr><br>
+        <form action="http://localhost:5000/filePredict" method="POST" enctype="multipart/form-data">
+            <input  type="file" name="file" />
+            <input type="submit"/>
+        </form>
+    </div>
+
+    <div class = "footer">
+        <h5>Copyright 2021. Gachon Univ. Dept of Software all rights reserved.</h5>
+    </div>
+</body>
+</html>
