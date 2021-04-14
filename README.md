@@ -1,3 +1,3 @@
 # MattingProject
 
-Detail Information --> Confirm Our Wiki!
+Detail Information --> Confirm Our Wiki Page!
