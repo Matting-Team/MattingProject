@@ -8,10 +8,10 @@ from torch.utils.data import random_split
 from torch.utils.data import DataLoader
 
 from scipy.ndimage import grey_dilation, grey_erosion
-from frameworks.reader import Opener
-from frameworks.loader import TorchLodader, augmentation_img, augmentation_tensor
-from models.model import TotalNet, Discriminator
-from frameworks.Utils import GaussianBlurLayer, print_tensor, valid_path, write_text, save_tensor
+from Utils.reader import Opener
+from Models.SegMatting.frameworks.loader import TorchLodader, augmentation_img, augmentation_tensor
+from Models.SegMatting.models.model import TotalNet, Discriminator
+from Utils.BasicUtil import GaussianBlurLayer, print_tensor, valid_path, write_text, save_tensor
 
 blurer = GaussianBlurLayer(1, 3)
 
@@ -50,7 +50,6 @@ def Training(config):
     network_config = config['Network']
 
     pretrained = train_config['Pretrained']
-    crop_shape = load_config['CropShape']
     epoch = train_config['EPOCH']
     pt_path = train_config['PtPath']
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -65,7 +64,7 @@ def Training(config):
     state_dict = {}
 
     blurer.to(device)
-    optimizer = optim.Adam(network.parameters(), lr=0.0002, betas=(0.5, 0.999))#optim.SGD(network.parameters(), lr=train_config['LR'], momentum=0.9)#optim.Adam(network.parameters(), lr=train_config['LR'])
+    optimizer = optim.Adam(network.parameters(), lr=0.0002, betas=(0.5, 0.999))
     optimizer_d = optim.Adam(discriminator.parameters(), lr=0.0002, betas=(0.5, 0.999))
 
     criterion = nn.MSELoss()

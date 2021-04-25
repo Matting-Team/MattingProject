@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 # custom Class
-import Network as net
+import Models.AttentionMatting.Network as net
 # net has ConvBatch//ConvTransBatch//UNet etc
 
 class Encoder(nn.Module):
@@ -116,19 +116,3 @@ class MattingNet(nn.Module):
         cat_feature = torch.cat([feature, fg_feature, bg_feature],dim=1)
         result = self.FusionNet(cat_feature)
         return result, fg, bg
-'''
-#forwarding Test
-dummy = torch.randn((1, 3, 256, 256))
-matting_net = MattingNet(basic_channel=64)
-result, fg, bg = matting_net(dummy)
-print(result.shape)
-'''
-'''
-encoder = Encoder(basic_channel=64)
-decoder = Decoder(basic_channel=64)
-result, list = encoder(dummy)
-print(result.shape, 'result shape')
-print(list[0].shape, 'first shape')
-result = decoder(result, list)
-print(result.shape, 'final result')
-'''
