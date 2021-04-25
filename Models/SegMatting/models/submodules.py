@@ -4,6 +4,15 @@ from random import randint
 import torch.nn.functional as F
 
 
+"""
+ConvLayer:
+#################################
+Parameter
+ norm - ['BN', 'IN']batch or instance normalization
+#################################
+Input
+ x - feature --> in_channels feature
+"""
 class ConvLayer(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, activation='relu', norm=None):
         super(ConvLayer, self).__init__()
@@ -33,6 +42,15 @@ class ConvLayer(nn.Module):
         return out
 
 
+"""
+TransposedConvLayer:
+#################################
+Parameter
+ norm - ['BN', 'IN']batch or instance normalization
+#################################
+Input
+ x - feature --> in_channels feature, 2x scale
+"""
 class TransposedConvLayer(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, activation='relu', norm=None):
         super(TransposedConvLayer, self).__init__()
@@ -63,7 +81,15 @@ class TransposedConvLayer(nn.Module):
 
         return out
 
-
+"""
+UpsampleConvLayer:
+#################################
+Parameter
+ norm - ['BN', 'IN']batch or instance normalization
+#################################
+Input
+ x - feature --> in_channels feature, 2 x scale
+"""
 class UpsampleConvLayer(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, activation='relu', norm=None):
         super(UpsampleConvLayer, self).__init__()
@@ -94,6 +120,15 @@ class UpsampleConvLayer(nn.Module):
 
         return out
 
+"""
+UpConvLayerShuffle:
+#################################
+Parameter
+ norm - ['BN', 'IN']batch or instance normalization
+#################################
+Input
+ x - feature --> in_channels feature, 2x scale
+"""
 class UpConvLayerShuffle(nn.Module):
     def __init__(self, in_channels, out_channels, scale=2, kernel_size=5, stride=1, padding=0, norm=None, activation=None):
         super(UpConvLayerShuffle, self).__init__()
@@ -124,7 +159,13 @@ class UpConvLayerShuffle(nn.Module):
         x = self.activation(x)
         return x
 
-# conv_batch, residual etc...
+
+"""
+MixtureNorm:
+#################################
+Input
+ x - feature --> in_channels feature
+"""
 class MixtureNorm(nn.Module):
     def __init__(self, channel):
         super(MixtureNorm, self).__init__()
@@ -139,7 +180,15 @@ class MixtureNorm(nn.Module):
         i_c = self.instance_norm(x[:, self.batch_channel:, ...].contiguous())
         return torch.cat([b_c, i_c], dim=1)
 
-#ConvBatch
+"""
+ConvBatch: Conv & BatchNormalization with Mixture Normalization
+#################################
+Parameter
+ norm - ['batch', 'instance', 'mixture'] choose one way
+#################################
+Input
+ x - feature --> in_channels feature
+"""
 class ConvBatch(nn.Module):
     def __init__(self, in_channel, out_channel, kernel_size=3, stride=1, padding=1, bias=False, norm="mixture", relu=False):
         super(ConvBatch, self).__init__()
@@ -159,7 +208,13 @@ class ConvBatch(nn.Module):
     def forward(self, x):
         return self.sequence(x)
 
-# Residual block
+
+"""
+ResidualBlock: Generate Residual Block
+#################################
+Input
+ x - feature --> in_channels feature
+"""
 class ResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels, downsample=None, norm="batch"):
         super(ResidualBlock, self).__init__()
@@ -178,7 +233,17 @@ class ResidualBlock(nn.Module):
         out = self.relu(out)
         return out
 
-#motivated by cbam
+"""
+ChannelWise: Channelwise Attention with 
+#################################
+Parameter
+ ratio - reduce channel ratio (2 --> 1/2, 4 --> 1/4 ...)
+#################################
+Input
+ x - feature --> in_channels feature
+Output
+ x - feature --> c wise attention feature
+"""
 class ChannelWise(nn.Module):
     def __init__(self, in_channel, out_channel, ratio):
         super(ChannelWise, self).__init__()
@@ -197,8 +262,19 @@ class ChannelWise(nn.Module):
         return input * feature.expand_as(input)
 
 
-# Predict Semantic Segmentation with Backbone
-# Pretrained MobileNetv2 Used...
+"""
+SegmentNet: extract high level feature with segment net
+segment network --> mobilenet v2
+#################################
+Parameter
+ bbackbone --> backbone module(mobilenet v2)
+#################################
+Input
+ x - feature --> in_channels feature
+Output
+ get 1x, 1/8x, [1/2x, 1/4x] features.
+ - feature, feature, list( length=2 ) -
+"""
 class SegmentNet(nn.Module):
     def __init__(self, backbone):
         super(SegmentNet, self).__init__()
@@ -444,17 +520,3 @@ class CBAM(nn.Module):
         x_out = self.conv1(x_out)
         x_out2 = self.sgate(x_out)
         return x_out2
-'''
-cwise = ChannelPool()
-swise = SpatialAttention()
-tensor= torch.randn(1, 3, 256, 256)
-enc_2x = torch.randn(1, 16, 128, 128)
-enc_4x = torch.randn(1, 24, 64, 64)
-hr_8 = torch.randn(1, 32, 32, 32)
-print(swise(tensor).shape)
-channels = [16, 24, 32, 96, 1280]
-detail = DetailNet(32, channels)
-result = detail(tensor, enc_2x, enc_4x, hr_8)
-print(result[0].shape)
-print(result[1].shape)
-'''

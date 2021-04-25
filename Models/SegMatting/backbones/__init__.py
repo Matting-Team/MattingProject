@@ -5,6 +5,6 @@ from .wrapper import *
 #  Replaceable Backbones
 #------------------------------------------------------------------------------
 
-SUPPORTED_BACKBONES = {
+BACKBONE_LIST = {
     'mobilenetv2': MobileNetV2Backbone,
 }

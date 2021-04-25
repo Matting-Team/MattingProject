@@ -130,15 +130,3 @@ def augmentation_tensor(input, gt, flip_h, flip_w):
         input = vertical_flip(input)
         gt = vertical_flip(gt)
     return input, gt
-
-'''
-# usage
-import frameworks.reader as reader
-R = reader.Opener("config.yaml")
-data_info = R.loader_config
-print(data_info)
-loader = TorchLodader(data_info)
-i, gt, _ = loader.__getitem__(0)
-print(i.shape)
-print(gt.shape)
-'''

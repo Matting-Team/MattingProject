@@ -2,9 +2,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from models.submodules import *
-from backbones import SUPPORTED_BACKBONES
+from Models.SegMatting.models.submodules import *
+from Models.SegMatting.backbones import SUPPORTED_BACKBONES
 
+"""
+TotalNet: Low Level & High Level data.
+
+"""
 class TotalNet(nn.Module):
     def __init__(self, input_channel=3, basic_channel=32, backbone='mobilenetv2', pretrained=True):
         super(TotalNet, self).__init__()

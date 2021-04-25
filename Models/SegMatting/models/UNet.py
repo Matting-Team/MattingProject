@@ -2,9 +2,9 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from models.submodules import ConvLayer, UpsampleConvLayer, ResidualBlock, UpConvLayerShuffle, SegmentNet, CBAM, SpatialGate2
+from Models.SegMatting.models.submodules import ConvLayer, UpsampleConvLayer, ResidualBlock, UpConvLayerShuffle, SegmentNet, CBAM, SpatialGate2, TransposedConvLayer
 
-from backbones import SUPPORTED_BACKBONES
+from Models.SegMatting.backbones import BACKBONE_LIST
 
 def skip_sum(x1, x2):
     return x1 + x2
@@ -29,7 +29,7 @@ class BaseUNet(nn.Module):
             self.UpsampleLayer = UpsampleConvLayer
         else:
             print('Using TransposedConvLayer (fast, with checkerboard artefacts)')
-            self.UpsampleLayer = UpConvLayerShuffle#TransposedConvLayer
+            self.UpsampleLayer = TransposedConvLayer
 
         self.num_encoders = num_encoders
         self.base_num_channels = base_num_channels
@@ -125,7 +125,7 @@ class UNetMatting(BaseUNet):
 
         self.head = ConvLayer(self.num_input_channels, self.base_num_channels,
                               kernel_size=5, stride=1, padding=2)  # N x C x H x W -> N x 32 x H x W
-        self.backbone = SUPPORTED_BACKBONES['mobilenetv2'](num_input_channels)
+        self.backbone = BACKBONE_LIST['mobilenetv2'](num_input_channels)
         self.backbone.load_pretrained_ckpt()
         self.segnet = SegmentNet(self.backbone)
 
@@ -166,7 +166,6 @@ class UNetMatting(BaseUNet):
             x = x * s_wise"""
             blocks.append(x)
 
-
         # residual blocks
         for resblock in self.resblocks:
             x = resblock(x)
@@ -194,7 +193,7 @@ class SegMatting(nn.Module):
             nn.BatchNorm2d(64),
             nn.LeakyReLU(0.02),
         )
-        self.backbone = SUPPORTED_BACKBONES['mobilenetv2'](self.input_c)
+        self.backbone = BACKBONE_LIST['mobilenetv2'](self.input_c)
         self.segmentNet = SegmentNet(self.backbone)
         self.base_feature = nn.Sequential(
             nn.Conv2d(segment_size[-1], self.base, 7, stride=1, padding=3),

@@ -14,6 +14,9 @@ import Models.AttentionMatting.Loss as loss
 from torch.utils.data import DataLoader
 from Utils.BasicUtil import print_img
 
+
+"""
+"""
 base_dir = 'C:/Users/kjm04/PycharmProjects/AdainNet/AdainMattingNet/Dataset'
 trimap_dir = '/trimap'
 input_dir = '/input'

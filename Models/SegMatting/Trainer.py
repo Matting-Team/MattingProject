@@ -1,6 +1,6 @@
-import frameworks.loader as dataloader
-import frameworks.reader as yamlreader
-import frameworks.Utils as utils
+import Models.SegMatting.frameworks.loader as dataloader
+import Utils.reader as yamlreader
+from Utils.BasicUtil import *
 
 config = yamlreader.Opener("frameworks/config.yaml")
 training_config = config["Training"]
