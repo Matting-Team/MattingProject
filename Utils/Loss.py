@@ -84,17 +84,20 @@ class AttNetLoss:
         gan_criterion = nn.BCELoss()
 
     def get_loss(self, gt, pred):
-
+        return 0
 class SegNetLoss:
-    def __init__(self):
+    def __init__(self, device):
         self.blurer = GaussianBlurLayer(1, 3)
-
         self.criterion = nn.MSELoss()
         self.l1_loss = nn.L1Loss()
-        self.gan_criterion = nn.BCELoss()
+        self.ssim_criterion = SSIM.SSIM(window_size=11).to(device)
     def get_loss(self, gt, pred_segment, pred):
         segment_gt = self.blurer(gt)
         segment_loss = self.criterion(pred_segment, segment_gt)
-        
+        alpha_l1_loss = self.l1_loss(pred, gt)
+        ssim_loss = (1-self.ssim_criterion(pred, gt))
+        return segment_loss + alpha_l1_loss + ssim_loss
+
+
 
 

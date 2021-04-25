@@ -6,7 +6,8 @@ import numpy as np
 from PIL import Image
 import random
 import torch.nn as nn
-from scipy.ndimage import rotate
+
+from Utils.ImageUtil import ToRandomRotationAndCrop
 
 transform = transforms.Compose([
     transforms.ToTensor(),
@@ -17,48 +18,22 @@ to_tensor = transforms.Compose([
 ])
 
 
-class ToRandomRotationAndCrop:
-    def __init__(self, max_angle, new_size):
-        self.max_angle = max_angle
-        self.new_size = new_size
-        self.on_rotation = 0
-        self.top_left = None
-
-    def set(self):
-        self.on_rotation = ((np.random.rand() * 2)-1.0) * self.max_angle
-        self.top_left = None
-
-    def get_valid_indies(self, size):
-        new_h, new_w = self.new_size
-
-        mask = rotate(np.ones(size), self.on_rotation)
-        mask[mask < 0.95] = 0
-        mask[mask > 0] = 1
-
-        mask_sum = np.sum(mask, axis=0)
-        valid_axis_x = np.where(mask_sum >= new_h)[0]
-
-        mask_sum = np.sum(mask, axis=1)
-        valid_axis_y = np.where(mask_sum >= new_w)[0]
-
-        candidate = []
-        for x in valid_axis_x[:-new_w + 1]:
-            for y in valid_axis_y[:-new_h + 1]:
-                if mask[y, x] and mask[y, x + new_w - 1] and mask[y + new_h - 1, x] and mask[
-                    y + new_h - 1, x + new_w - 1]:
-                    candidate.append((y, x))
-        return candidate[np.random.randint(0,len(candidate))]
-
-    def apply(self, sample):
-        sample = rotate(sample, self.on_rotation)
-        return sample
-
 def horizontal_flip(tensor):
     return torch.flip(tensor, [0, 2])
 
 def vertical_flip(tensor):
     return torch.flip(tensor, [0, 1])
 
+"""
+TorchLoader: Augmentation is performed in the same way as reading the image and gt.
+Parameter: yaml config, validation set, whether augmentation is in progress
+ - config: yaml file saved as opener class --> dict type
+ - validation: Whether to validate. The file read path is changed.
+ - aug: Whether augmentation or not
+############################################################################
+Input:
+ - index: file index within length
+"""
 class TorchLodader(DataLoader):
     def __init__(self, data_config, validation = False, aug=False):
         self.input_type = data_config['INPUT_TYPE']
@@ -87,12 +62,19 @@ class TorchLodader(DataLoader):
 
     def __len__(self):
         return len(self.input_list)
-
+    """
+    safe_crop: Safe cropping that doesn't go out of range
+    #####################################################
+    Input
+     - img: 3 channel RGB Image
+     - gt: 1 channel Grayscale Alphamap
+     - size: crop size
+    """
     def safe_crop(self, img, gt, size):
         h, w, c = img.shape
         if h<=size[0] or w<=size[1]:#resize
-            img = img.resize((512, 512))
-            gt = gt.resize((512, 512))
+            img = img.resize(size)
+            gt = gt.resize(size)
             img = np.array(img)[..., :3]
             gt = np.array(gt)
         else:
@@ -106,25 +88,18 @@ class TorchLodader(DataLoader):
         return img, gt
 
     def __getitem__(self, idx):
-        if self.sub_input <=0:
-            sub_input = None
-        else:
-            sub_input = Image.open(os.path.join(self.hint_path, self.hint_list[idx]))
-            #preprocessing --> not implemented
         input = Image.open(os.path.join(self.input_path, self.input_list[idx]))
         gt = Image.open(os.path.join(self.gt_path, self.gt_list[idx])).convert('L')
 
         if self.augmentation:
             if input.size[0] > self.crop_shape[0] and input.size[1] > self.crop_shape[1]:
-                #cropper = ToRandomRotationAndCrop(45, self.crop_shape)
-                #cropper.set()
-                #input, gt = augmentation_img(input, gt, cropper)
-                input = np.array(input)
-                gt = np.array(gt)
-                input, gt = self.safe_crop(input, gt, self.crop_shape)
+                cropper = ToRandomRotationAndCrop(45, self.crop_shape)
+                cropper.set()
+                input, gt = augmentation_img(input, gt, cropper)
+
             else:
                 input = input.resize(self.crop_shape)
-                gt = gt.resize(self.crop_shape)#self.reshaper(gt.unsqueeze(0)).squeeze(0)
+                gt = gt.resize(self.crop_shape)
 
         input = transform(input)
         gt = to_tensor(gt)
@@ -138,12 +113,15 @@ class TorchLodader(DataLoader):
             gt = reshaper(gt.unsqueeze(0)).squeeze(0)
         return input, gt
 
+# augmentation (ToRandomRotate & Cropper) Apply
+# input and gt must be given the same value
 def augmentation_img(input, gt, cropper):
     input = cropper.apply(input)
     gt = cropper.apply(gt)
 
     return input, gt
 
+# There are augmentations in the tensor state, horizon and vertical flip.
 def augmentation_tensor(input, gt, flip_h, flip_w):
     if flip_h == 1:
         input = horizontal_flip(input)
