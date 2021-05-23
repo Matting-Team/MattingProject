@@ -6,7 +6,6 @@ from frameworks.Utils import print_tensor
 import torchvision.transforms as transforms
 import PIL.Image as Image
 import io
-
 def Inference():
     # Load Configs --> base c, input c, path etc...
     path = "D:/Dataset/MattingTest/own_image"
@@ -16,7 +15,7 @@ def Inference():
     network.load_state_dict(state_dict)
     input = load_singular_image(path, name)
 
-    alpha = network(input)
+    segment, detail, alpha = network(input)
     print_tensor(alpha)
 
 def transform_byte_image(image_byte):
@@ -54,5 +53,3 @@ def InferenceImage(image_byte, network):
     print(alpha.min())
     print(alpha.max())
     return alpha
-
-Inference()

@@ -3,17 +3,6 @@ import torch.nn as nn
 from backbones.wrapper import MobileNetV2Backbone
 from models.submodules import SegmentB, SubB, FusionBranch
 
-'''
-# CamNet : MobileNetv2를 이용하여 
-# ##########
-# parameter
-# input_c --> input channel of CANet
-# base_c --> Basic Channel of Network(32)
-# pretrained --> is pretrained or not
-# ##########
-# output --> feature 0 - 1
-# ##########
-'''
 class CamNet(nn.Module):
     def __init__(self, input_c=3, base_c=32, pretrained=True):
         super(CamNet, self).__init__()
@@ -29,44 +18,34 @@ class CamNet(nn.Module):
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                self.initialize(m)
+                self._init_conv(m)
             elif isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.InstanceNorm2d):
-                self.initialize_norm(m)
+                self._init_norm(m)
 
         if self.pretrained:
-            self.backbone.load_backbone()
+            self.backbone.load_pretrained_ckpt()
 
     def forward(self, img):
-        segment, low_level8, [low_level2, low_level4] = self.segment_branch(img)
-
-        boundary, high_level2 = self.detail_branch(img, low_level2, low_level4, low_level8)
-        alpha = self.fusionNet(img, low_level8, high_level2)
+        segment, s8, [e2, e4] = self.segment_branch(img)
+        boundary, d2 = self.detail_branch(img, e2, e4, s8)
+        alpha = self.fusionNet(img, s8, d2)
         return alpha
 
-    def initialize(self, conv):
+    def _init_conv(self, conv):
         nn.init.kaiming_uniform_(
             conv.weight, a=0, mode='fan_in', nonlinearity='relu')
         if conv.bias is not None:
             nn.init.constant_(conv.bias, 0)
 
-    def initialize_norm(self, norm):
+    def _init_norm(self, norm):
         if norm.weight is not None:
             nn.init.constant_(norm.weight, 1)
             nn.init.constant_(norm.bias, 0)
 
-
-'''
-# Discriminator: Discriminator는 RGB 입력이미지 + Alpha map을 입력으로 받아 진위여부를 판별한다.
-# ##########
-# parameter
-# input_c --> input channel of Discriminator
-# ##########
-# output --> feature 0 - 1
-# ##########
-'''
 class Discriminator(nn.Module):
     def __init__(self, input_c):
         super(Discriminator, self).__init__()
+        #input shape is 512 512
         channels = [64, 128, 256, 256, 512, 1]
         layer = nn.ModuleList([])
         current_c = input_c

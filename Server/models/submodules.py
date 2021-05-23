@@ -18,6 +18,7 @@ class ConvNorm(nn.Module):
 
         return torch.cat((bn_x, in_x), 1)
 
+
 class ConvBatchRelu(nn.Module):
 
     def __init__(self, in_channels, out_channels, kernel_size,
@@ -41,16 +42,7 @@ class ConvBatchRelu(nn.Module):
     def forward(self, x):
         return self.layers(x)
 
-'''
-# CWise: Channel에 Weight를 부과하는 Channelwise Attention --> CBAM Base
-# ##########
-# ##########
-# parameter
-# input_c --> input channel of Discriminator
-# ##########
-# output --> feature 0 - 1
-# ##########
-'''
+
 class CWise(nn.Module):
     def __init__(self, in_channels, out_channels, ratio=1):
         super(CWise, self).__init__()
@@ -69,16 +61,7 @@ class CWise(nn.Module):
 
         return x * w.expand_as(x)
 
-'''
-# CWise: Channel에 Weight를 부과하는 Channelwise Attention --> CBAM Base
-# ##########
-# ##########
-# parameter
-# input_c --> input channel of Discriminator
-# ##########
-# output --> feature 0 - 1
-# ##########
-'''
+
 class SegmentB(nn.Module):
     def __init__(self, backbone):
         super(SegmentB, self).__init__()
@@ -92,30 +75,20 @@ class SegmentB(nn.Module):
 
     def forward(self, img):
         e_feature = self.backbone.forward(img)
-        low_level2, low_level4, low_level32 = e_feature[0], e_feature[1], e_feature[4]
+        e2, e4, e32 = e_feature[0], e_feature[1], e_feature[4]
 
-        low_level32 = self.c_wise(low_level32)
-        segment_lower = F.interpolate(low_level32, scale_factor=2, mode='bilinear', align_corners=False)
-        segment_lower = self.conv_s16(segment_lower)
-        segment_upper = F.interpolate(segment_lower, scale_factor=2, mode='bilinear', align_corners=False)
-        segment_upper = self.conv_s8(segment_upper)
+        e32 = self.c_wise(e32)
+        s16 = F.interpolate(e32, scale_factor=2, mode='bilinear', align_corners=False)
+        s16 = self.conv_s16(s16)
+        s8 = F.interpolate(s16, scale_factor=2, mode='bilinear', align_corners=False)
+        s8 = self.conv_s8(s8)
 
-        lr = self.conv_lr(segment_upper)
+        lr = self.conv_lr(s8)
         segment = torch.sigmoid(lr)
 
-        return segment, segment_upper, [low_level2, low_level4]
+        return segment, s8, [e2, e4]
 
 
-'''
-# CWise: Channel에 Weight를 부과하는 Channelwise Attention --> CBAM Base
-# ##########
-# ##########
-# parameter
-# input_c --> input channel of Discriminator
-# ##########
-# output --> feature 0 - 1
-# ##########
-'''
 class SubB(nn.Module):
 
     def __init__(self, hr_channels, enc_channels):
@@ -168,16 +141,6 @@ class SubB(nn.Module):
         return pred_detail, hr2x
 
 
-'''
-# Fusion Branch
-# ##########
-# ##########
-# parameter
-# input_c --> input channel of Discriminator
-# ##########
-# output --> feature 0 - 1
-# ##########
-'''
 class FusionBranch(nn.Module):
     def __init__(self, hr_channels, enc_channels):
         super(FusionBranch, self).__init__()
