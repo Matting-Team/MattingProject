@@ -17,7 +17,7 @@ from Utils.BasicUtil import print_img
 
 """
 """
-base_dir = 'C:/Users/kjm04/PycharmProjects/AdainNet/AdainMattingNet/Dataset'
+base_dir = 'Dataset path'
 trimap_dir = '/trimap'
 input_dir = '/input'
 gt_dir = '/gt'

@@ -21,7 +21,7 @@ epoch = 10
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 # Dataset Directory:
-base_dir = 'C:/Users/kjm04/PycharmProjects/AdainNet/AdainMattingNet/Dataset'
+base_dir = "Dataset Path"
 trimap_dir = '/trimap'
 input_dir = '/input'
 gt_dir = '/gt'

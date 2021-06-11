@@ -3,9 +3,7 @@ from Utils.Loss import SSIM
 import torch.nn as nn
 import torch.nn.functional as f
 import tqdm
-from torch.utils.data import DataLoader
-import torch.optim as optim
-
+from Utils.ImageUtil import psudo_detail
 
 # This function trains a specific epoch.
 # Learning is performed using GAN, and generators, discriminators, and optimizers are received as inputs.
@@ -61,15 +59,48 @@ def validation(epoch, generator, dataset, device):
 
     print("Current epoch is {} epoch loss is {}".format(epoch, current_epoch_loss / len(dataset)))
 
-def trainer_without_gan(epoch, generator, dataset, optimizer_g, device):
-    generator.train()
-    print("{} epoch train start...".format(epoch))
+
+def evaluation_testset(epoch, generator, dataset, device):
+    generator.eval()
+    mse = nn.MSELoss()
+
+    current_epoch_loss = 0.0
+    print("{} epoch validation start...".format(epoch))
     for data in tqdm.tqdm(dataset):
+
         input_data, gt = data
         input_data = input_data.to(device)
         gt = gt.to(device)
 
         alpha = generator(input_data)
+
+        current_epoch_loss += loss
+
+    print("Current epoch is {} epoch loss is {}".format(epoch, current_epoch_loss / len(dataset)))
+
+
+# This function perform training without GAN
+###################################################################
+def trainer_without_gan(epoch, generator, dataset, optimizer_g, device):
+    generator.train()
+    loss_module = loss_estimator()
+    current_epoch_loss = 0.0
+    print("{} epoch train start...".format(epoch))
+    for data in tqdm.tqdm(dataset):
+
+        optimizer_g.zero_grad()
+        input_data, gt = data
+        input_data = input_data.to(device)
+        gt = gt.to(device)
+
+        alpha = generator(input_data)
+        loss = loss_module(gt, alpha)
+        loss.backward()
+        optimizer_g.step()
+
+        with torch.no_grad():
+            current_epoch_loss += loss
+    print("Current epoch is {} epoch loss is {}".format(epoch, current_epoch_loss / len(dataset)))
 
 
 
@@ -79,10 +110,16 @@ class loss_estimator(nn.Module):
         self.mse_loss = nn.MSELoss()
         self.ssim_loss = SSIM(window_size=11)
 
-    def forward(self, gt, predict):
+    def forward(self, gt, predict, hint=False):
         l1 = self.l1_loss(predict, gt)
         ssim = 1-self.ssim_loss(predict, gt)
-        return l1+ssim
+        loss = l1+ssim
+        if hint:
+            psudo_p = psudo_detail(predict, predict.device)
+            psudo_gt = psudo_detail(gt, gt.device)
+            loss += self.l1_loss(psudo_p, psudo_gt)
+        return loss
+
 
 def gan_loss_estimator(discriminator, gt, predict, image, real_label, fake_label, mode="g"):
     real_image = gt * image

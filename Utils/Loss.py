@@ -40,6 +40,13 @@ def _ssim(img1, img2, window, window_size, channel, size_average=True):
     else:
         return ssim_map.mean(1).mean(1).mean(1)
 
+# get SAD value metric...
+################################################
+def SAD(gt, alpha):
+    diff = alpha - gt
+    diff = torch.abs(diff)
+    sad = torch.sum(diff)
+    return sad
 
 class SSIM(torch.nn.Module):
     def __init__(self, window_size=11, size_average=True):

@@ -1,3 +1,4 @@
+import torch
 import numpy as np
 from scipy.ndimage import rotate
 """
@@ -38,3 +39,26 @@ class ToRandomRotationAndCrop:
     def apply(self, sample):
         sample = rotate(sample, self.on_rotation)
         return sample
+
+
+def psudo_detail(gt, device):
+    b, c, h, w = gt.shape
+    gt = gt.data.cpu().numpy()
+    boundaries = []
+    for sdx in range(0, b):
+        alpha = np.transpose(gt[sdx], (1, 2, 0))
+        k_size = 10
+        iterations = 10
+        kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (k_size, k_size))
+        dilated = cv.dilate(alpha, kernel, iterations)
+        eroded = cv.erode(alpha, kernel, iterations)
+
+        edge = np.zeros(alpha.shape)
+        edge.fill(0.5)
+        edge[eroded >= 1.0] = 1.0
+        edge[dilated <= 0] = 0
+        edge = torch.from_numpy(edge).permute(2, 0, 1).unsqueeze(0)
+        boundaries.append(edge)
+    boundaries = torch.cat(boundaries, dim=0)
+    boundaries = torch.tensor(boundaries).float().to(device)
+    return boundaries

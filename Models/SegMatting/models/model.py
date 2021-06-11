@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from Models.SegMatting.models.submodules import *
-from Models.SegMatting.backbones import SUPPORTED_BACKBONES
+from Models.SegMatting.backbones import BACKBONE_LIST
 
 """
 TotalNet: Low Level & High Level data.
@@ -18,7 +18,7 @@ class TotalNet(nn.Module):
         self.backbone_name = backbone
         self.pretrained = pretrained
 
-        self.backbone = SUPPORTED_BACKBONES[self.backbone_name](input_channel)
+        self.backbone = BACKBONE_LIST[self.backbone_name](input_channel)
         self.segmentNet = SegmentNet(self.backbone)
         self.detailNet = DetailNet(self.basic_channel, self.backbone.channels)
         self.fusion = FusionNet(self.basic_channel, self.backbone.channels)

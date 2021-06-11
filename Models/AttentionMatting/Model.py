@@ -4,9 +4,7 @@ import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
 
-# custom Class
 import Models.AttentionMatting.Network as net
-# net has ConvBatch//ConvTransBatch//UNet etc
 
 class Encoder(nn.Module):
     def __init__(self, basic_channel=32, depth=3):
@@ -17,7 +15,7 @@ class Encoder(nn.Module):
             m = nn.Sequential(
                 net.ConvBatchBlock(c, c * 2, 4, stride=2, padding=1),
                 net.ResBlock(c*2),
-                nn.ReLU(inplace=True)#Activation of Res Block
+                nn.ReLU(inplace=True)
             )
             self.m_list.append(m)
             c = c*2
