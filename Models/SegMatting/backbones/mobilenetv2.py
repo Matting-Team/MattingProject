@@ -95,7 +95,7 @@ class MobileNetV2(nn.Module):
 		last_channel = 1280
 		interverted_residual_setting = [
 			# t, c, n, s
-			[1        , 16, 1, 1],
+			[1, 16, 1, 1],
 			[expansion, 24, 2, 2],
 			[expansion, 32, 3, 2],
 			[expansion, 64, 4, 2],
@@ -159,7 +159,7 @@ class MobileNetV2(nn.Module):
 		pretrain_dict = torch.load(pretrained_file)
 		model_dict = {}
 		state_dict = self.state_dict()
-		print("[MobileNetV2] Loading pretrained model...")
+		print("Loading pretrained model...")
 		for k, v in pretrain_dict.items():
 			if k in state_dict:
 				model_dict[k] = v

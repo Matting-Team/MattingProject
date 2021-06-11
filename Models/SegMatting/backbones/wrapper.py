@@ -3,7 +3,7 @@ from functools import reduce
 
 import torch
 import torch.nn as nn
-from backbones.mobilenetv2 import MobileNetV2
+from Models.SegMatting.backbones.mobilenetv2 import MobileNetV2
 
 #from .mobilenetv2 import MobileNetV2
 #from mobilenetv2 import MobileNetV2
@@ -48,8 +48,7 @@ class MobileNetV2Backbone(BaseBackbone):
         return [enc2x, enc4x, enc8x, enc16x, enc32x]
 
     def load_pretrained_ckpt(self):
-        # the pre-trained model is provided by https://github.com/thuyngch/Human-Segmentation-PyTorch 
-        #ckpt_path = './pretrained/mobilenetv2.ckpt'
+        # the pre-trained model is provided by https://github.com/thuyngch/Human-Segmentation-PyTorch
         ckpt_path = 'pretrained/mobilenetv2.ckpt'
         if not os.path.exists(ckpt_path):
             print('cannot find the pretrained mobilenetv2 backbone')
@@ -58,37 +57,3 @@ class MobileNetV2Backbone(BaseBackbone):
         ckpt = torch.load(ckpt_path)
         self.model.load_state_dict(ckpt)
 
-
-'''
-import PIL.Image as Image
-import torchvision.transforms as transforms
-import torchvision
-import numpy as np
-import matplotlib.pyplot as plt
-
-transform = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
-])
-
-Backbone = MobileNetV2Backbone(3)
-Backbone.load_pretrained_ckpt()
-input = Image.open("india.jpg")
-input = input.resize((512, 512))
-input = transform(input).unsqueeze(0)
-print(input.shape)
-
-
-result = Backbone(input)
-
-def tensor_plot(tensor):
-    tensor = tensor.detach().cpu()
-    tensor = torch.mean(tensor, dim=1)
-    img = torchvision.utils.make_grid(tensor)
-    img = np.transpose(img, (1, 2, 0))
-    plt.imshow(img)
-    plt.show()
-tensor_plot(result[-1])
-print(result[3].shape) # 뭔가를 얻는게 아니라, feature를 뽑는거라서 이런듯?
-#생각만큼 segmentation의 결과가 좋지는 않다?
-'''
