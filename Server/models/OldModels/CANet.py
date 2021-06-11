@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.models as models
-import models.OldModels.AttModule as attnet
+import Server.models.OldModels.AttModule as attnet
 
 def get_n_params(model):
     pp=0

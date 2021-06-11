@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
-from backbones.wrapper import MobileNetV2Backbone
-from models.submodules import SegmentB, SubB, FusionBranch
+from Server.backbones.wrapper import MobileNetV2Backbone
+from Server.models.submodules import SegmentB, SubB, FusionBranch
 
 class CamNet(nn.Module):
     def __init__(self, input_c=3, base_c=32, pretrained=True):

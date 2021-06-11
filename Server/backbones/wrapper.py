@@ -47,7 +47,7 @@ class MobileNetV2Backbone(BaseBackbone):
 
     def load_pretrained_ckpt(self):
         # the pre-trained model https://github.com/thuyngch/Human-Segmentation-PyTorch
-        ckpt_path = 'backbones/pretrained/mobilenetv2_human_seg.ckpt'
+        ckpt_path = 'backbones/pretrained/mobilenetv2.ckpt'
         if not os.path.exists(ckpt_path):
             print('there is no Pretrained File!')
             exit()

@@ -1,8 +1,8 @@
 import torch
 import numpy as np
-from models.network import CamNet
-from frameworks.ImageLoader import load_singular_image
-from frameworks.Utils import print_tensor
+from Server.models.network import CamNet
+from Server.frameworks.ImageLoader import load_singular_image
+from Server.frameworks.Utils import print_tensor
 import torchvision.transforms as transforms
 import PIL.Image as Image
 import io

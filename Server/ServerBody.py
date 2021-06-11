@@ -7,10 +7,10 @@ from numpy import byte
 from torchvision.io import read_image
 from werkzeug.utils import secure_filename
 
-from Inference import InferenceImage, Inference, tensor2image
-from models.network import CamNet
-from frameworks.ImageLoader import load_singular_image
-from frameworks.Utils import print_tensor
+from Server.Inference import InferenceImage, Inference, tensor2image
+from Server.models.network import CamNet
+from Server.frameworks.ImageLoader import load_singular_image
+from Server.frameworks.Utils import print_tensor
 
 from tempfile import NamedTemporaryFile
 from shutil import copyfileobj
@@ -70,5 +70,5 @@ def generate_png(pil_image):
 
 if __name__=='__main__':
     app.run(debug=True)
-    #app.run(host='0.0.0.0', debug=True)
+
 

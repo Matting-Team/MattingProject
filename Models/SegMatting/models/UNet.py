@@ -6,6 +6,10 @@ from Models.SegMatting.models.submodules import ConvLayer, UpsampleConvLayer, Re
 
 from Models.SegMatting.backbones import BACKBONE_LIST
 
+
+#
+# Basic UNet
+#
 def skip_sum(x1, x2):
     return x1 + x2
 
@@ -233,7 +237,7 @@ class SegMatting(nn.Module):
         seg_from8_2 = F.interpolate(seg_8, scale_factor=4, align_corners=False, mode="bilinear")
         seg_from8_2 = self.base_feature(seg_from8_2)
         mask = self.spatial_gate(seg_from8_2)
-        input_feature = input_feature#*mask#torch.cat([input_feature, seg_from8_2], dim=1)#self.spatial_gate(seg_from8_2)
+        input_feature = input_feature
 
         high_feature = input_feature
 
