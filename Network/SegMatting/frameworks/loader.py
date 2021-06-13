@@ -7,7 +7,7 @@ from PIL import Image
 import random
 import torch.nn as nn
 
-from Utils.ImageUtil import ToRandomRotationAndCrop
+from Network.Utils.ImageUtil import ToRandomRotationAndCrop
 
 transform = transforms.Compose([
     transforms.ToTensor(),

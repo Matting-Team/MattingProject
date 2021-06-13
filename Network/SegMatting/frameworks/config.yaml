@@ -7,7 +7,7 @@ Training:
   EPOCH: 80
   LogPath: 'Log Path'
   PtPath: 'Pt save Path'
-  Pretrained: True
+  Pretrained: False
 
 # LOADER_OPTION
 Loader:
@@ -18,11 +18,11 @@ Loader:
   SUB_INPUT: 0
   CropShape: [512, 512]
 
-  INPUT_PATH: 'D:/Dataset/MattingTest/image'
-  GT_PATH: 'D:/Dataset/MattingTest/gt'
+  INPUT_PATH: '/input image path'
+  GT_PATH: '/ground truth image path'
   HINT_PATH: '/'
-  Valid_Path: 'D:/Dataset/MattingTest/image'
-  GT_valid: 'D:/Dataset/MattingTest/gt'
+  Valid_Path: '/ validation image path'
+  GT_valid: '/ground truth image path(validation)'
 
 # NETWORK_OPTION
 Network:

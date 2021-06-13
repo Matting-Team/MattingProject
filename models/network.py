@@ -3,6 +3,10 @@ import torch.nn as nn
 from backbones.wrapper import MobileNetV2Backbone
 from models.submodules import SegmentB, SubB, FusionBranch
 
+# CAMNet main network.
+#
+#
+##############################################################################
 class CamNet(nn.Module):
     def __init__(self, input_c=3, base_c=32, pretrained=True):
         super(CamNet, self).__init__()
@@ -42,10 +46,12 @@ class CamNet(nn.Module):
             nn.init.constant_(norm.weight, 1)
             nn.init.constant_(norm.bias, 0)
 
+# Patch GAN Discriminator
+# input = 512 x 512 shape
+##############################################################
 class Discriminator(nn.Module):
     def __init__(self, input_c):
         super(Discriminator, self).__init__()
-        #input shape is 512 512
         channels = [64, 128, 256, 256, 512, 1]
         layer = nn.ModuleList([])
         current_c = input_c

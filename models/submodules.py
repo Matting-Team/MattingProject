@@ -2,23 +2,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-class ConvNorm(nn.Module):
-    def __init__(self, in_channels):
-        super(ConvNorm, self).__init__()
-        in_channels = in_channels
-        self.bnorm_channels = int(in_channels / 2)
-        self.inorm_channels = in_channels - self.bnorm_channels
-
-        self.bnorm = nn.BatchNorm2d(self.bnorm_channels, affine=True)
-        self.inorm = nn.InstanceNorm2d(self.inorm_channels, affine=False)
-
-    def forward(self, x):
-        bn_x = self.bnorm(x[:, :self.bnorm_channels, ...].contiguous())
-        in_x = self.inorm(x[:, self.bnorm_channels:, ...].contiguous())
-
-        return torch.cat((bn_x, in_x), 1)
 
 
+# Conv Batch Normalization
+# ***Basic Module!!!!***
 class ConvBatchRelu(nn.Module):
 
     def __init__(self, in_channels, out_channels, kernel_size,
@@ -42,7 +29,25 @@ class ConvBatchRelu(nn.Module):
     def forward(self, x):
         return self.layers(x)
 
+# Normalization options...
+class ConvNorm(nn.Module):
+    def __init__(self, in_channels):
+        super(ConvNorm, self).__init__()
+        in_channels = in_channels
+        self.bnorm_channels = int(in_channels / 2)
+        self.inorm_channels = in_channels - self.bnorm_channels
 
+        self.bnorm = nn.BatchNorm2d(self.bnorm_channels, affine=True)
+        self.inorm = nn.InstanceNorm2d(self.inorm_channels, affine=False)
+
+    def forward(self, x):
+        bn_x = self.bnorm(x[:, :self.bnorm_channels, ...].contiguous())
+        in_x = self.inorm(x[:, self.bnorm_channels:, ...].contiguous())
+
+        return torch.cat((bn_x, in_x), 1)
+
+# Channel wise attention
+# spatial 정보를 제거함으로
 class CWise(nn.Module):
     def __init__(self, in_channels, out_channels, ratio=1):
         super(CWise, self).__init__()

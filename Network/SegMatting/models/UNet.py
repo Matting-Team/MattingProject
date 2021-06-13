@@ -2,9 +2,9 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from Models.SegMatting.models.submodules import ConvLayer, UpsampleConvLayer, ResidualBlock, UpConvLayerShuffle, SegmentNet, CBAM, SpatialGate2, TransposedConvLayer
+from Network.SegMatting.models.submodules import ConvLayer, UpsampleConvLayer, ResidualBlock, UpConvLayerShuffle, SegmentNet, CBAM, SpatialGate2, TransposedConvLayer
 
-from Models.SegMatting.backbones import BACKBONE_LIST
+from Network.SegMatting.backbones import BACKBONE_LIST
 
 
 #

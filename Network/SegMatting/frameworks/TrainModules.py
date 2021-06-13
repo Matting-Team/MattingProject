@@ -1,10 +1,10 @@
 import torch
-from Utils.Loss import SSIM
+from Network.Utils.Loss import SSIM
 import torch.nn as nn
 import torch.nn.functional as f
 import tqdm
-from Utils.ImageUtil import psudo_detail
-from Utils.Loss import SAD
+from Network.Utils.ImageUtil import psudo_detail
+from Network.Utils.Loss import SAD
 
 # This function trains a specific epoch.
 # Learning is performed using GAN, and generators, discriminators, and optimizers are received as inputs.

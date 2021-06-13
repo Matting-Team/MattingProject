@@ -1,3 +1,0 @@
-# MattingProject
-
-Testing

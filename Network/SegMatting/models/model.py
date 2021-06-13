@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from Models.SegMatting.models.submodules import *
-from Models.SegMatting.backbones import BACKBONE_LIST
+from Network.SegMatting.models.submodules import *
+from Network.SegMatting.backbones import BACKBONE_LIST
 
 """
 TotalNet: Low Level & High Level data.

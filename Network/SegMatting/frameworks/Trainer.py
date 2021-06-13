@@ -9,11 +9,11 @@ import torch.optim as optim
 
 from torch.utils.data import DataLoader
 
-from Utils.reader import Opener
-from Models.SegMatting.frameworks.loader import TorchLodader
-from Models.SegMatting.models.model import TotalNet, Discriminator
-from Utils.BasicUtil import GaussianBlurLayer, valid_path, write_text, save_tensor
-from Utils.ImageUtil import psudo_detail
+from Network.Utils.reader import Opener
+from Network.SegMatting.frameworks.loader import TorchLodader
+from Network.SegMatting.models.model import TotalNet, Discriminator
+from Network.Utils.BasicUtil import GaussianBlurLayer, valid_path, write_text, save_tensor
+from Network.Utils.ImageUtil import psudo_detail
 
 blurer = GaussianBlurLayer(1, 3)
 

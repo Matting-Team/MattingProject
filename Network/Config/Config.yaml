@@ -1,12 +1,12 @@
 # Training_option
 Training:
   BATCH_SIZE: 4
-  OUTPUT_PATH: '/home/cvip/BigDisk/imagepro/Result/SegmentMatting/output_image'
+  OUTPUT_PATH: ''
   OPTIMIZER: 'Adam'
-  LR: 0.01
-  EPOCH: 300
-  LogPath: '/home/cvip/BigDisk/imagepro/Result/SegmentMatting/log'
-  PtPath: '/home/cvip/BigDisk/imagepro/Result/SegmentMatting/pt_result'
+  LR: 0.0001
+  EPOCH: 80
+  LogPath: ''
+  PtPath: ''
   Pretrained: True
 
 # LOADER_OPTION
@@ -18,11 +18,11 @@ Loader:
   SUB_INPUT: 0
   CropShape: [512, 512]
 
-  INPUT_PATH: '/home/cvip/BigDisk/imagepro/Dataset/HumanDataset/train/input'
-  GT_PATH: '/home/cvip/BigDisk/imagepro/Dataset/HumanDataset/train/gt'
-  HINT_PATH: '/'
-  Valid_Path: '/home/cvip/BigDisk/imagepro/Dataset/HumanDataset/test/input'
-  GT_valid: '/home/cvip/BigDisk/imagepro/Dataset/HumanDataset/test/gt'
+  INPUT_PATH: '/path of '
+  GT_PATH: '/path of training set ground truth'
+  HINT_PATH: '/not-used'
+  Valid_Path: '/path of validation sets'
+  GT_valid: '/path of validation sets ground truth'
 
 # NETWORK_OPTION
 Network:

@@ -3,7 +3,7 @@ from functools import reduce
 
 import torch
 import torch.nn as nn
-from Models.SegMatting.backbones.mobilenetv2 import MobileNetV2
+from Network.SegMatting.backbones.mobilenetv2 import MobileNetV2
 class BaseBackbone(nn.Module):
     """ Superclass of Replaceable Backbone Model for Semantic Estimation
     """
@@ -45,8 +45,6 @@ class MobileNetV2Backbone(BaseBackbone):
         return [enc2x, enc4x, enc8x, enc16x, enc32x]
 
     def load_pretrained_ckpt(self):
-        # the pre-trained model is provided by https://github.com/thuyngch/Human-Segmentation-PyTorch
-        #print(os.listdir('../backbones/pretrained/mobilenetv2.ckpt'))
         ckpt_path = '../backbones/pretrained/mobilenetv2.ckpt'
         if not os.path.exists(ckpt_path):
             print('cannot find the pretrained mobilenetv2 backbone')
