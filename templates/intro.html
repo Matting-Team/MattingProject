@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>INTRO</title>
+
+    <link rel="stylesheet" href="../static/CSS/layout.css?ver=1">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://fengyuanchen.github.io/cropper/js/cropper.js"></script>
+
+    <style>
+        body {
+            font-family: 'Do Hyeon', sans-serif;
+        }
+        .header {
+            background-color: rgba(220, 214, 214,0.7);
+            color: #000000;
+            padding: 20px;
+            text-align: center;
+        }
+        .main_common{
+            display: inline-block;
+            width: 300px;
+            height: 453px;
+            margin: 5px 10px 5px 10px;
+            border: 1px solid black;
+            background-color: rgba(185, 185, 185, 0.5);
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+
+            box-shadow: 2px 2px 8px 0px #000000;
+        }
+        .main_common:hover div {
+            transform: translate(0, 0);
+            transition: all 0.2s ease-in;
+        }
+        .main_common div{
+            position: absolute;
+            box-sizing: border-box;
+            bottom: 0;
+            width: 300px;
+            transform: translate(0, 100%);
+            padding: 15px;
+            background-color: rgba(0,0,0,0.5);
+            text-align:center;
+            transition: all 0.2s ease-in;
+        }
+        .main_common h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #eeeeee;
+            padding: 15px;
+        }
+
+        .main_common p{
+            font-size: 14px;
+            color: #dddddd;
+        }
+
+        .footer {
+            background-color: rgba(220, 214, 214,0.7);
+            padding: 10px;
+            text-align: center;
+        }
+        .a{
+            background-image: url("../static/images/bg.jpeg");
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        a:link{
+            color: white;
+            text-decoration: none;
+        }
+        a:visited{
+            color: white;
+            text-decoration: none;
+        }
+        a:hover{
+            color: #29407F;
+        }
+    </style>
+</head>
+
+<body class="a">
+    <div class = "header">
+        <h1>DEEP IMAGE MATTING</h1>
+        <p>Gachon Univ. Software Graduation Project</p>
+    </div>
+
+    <div class = "main" align="center">
+        <div class="main_common">
+            <h2 style="font-size: 20px; line-height: 120px; color: #F7F7FA;"> MENU 1 </h2>
+            <a href = "/home" style="font-size: 40px; font-weight: bold; line-height: 60px;"> UPLOAD </a>
+            <div>
+                <h2> IMAGE UPLOAD </h2>
+                <p> 이미지를 서버에 업로드하고, <br> 알파맵을 추출합니다. </p>
+            </div>
+        </div>
+
+        <div class="main_common">
+            <h2 style="font-size: 20px; line-height: 120px; color: #F7F7FA;"> MENU 2 </h2>
+            <a href = "/composite" style="font-size: 40px; font-weight: bold; line-height: 60px;"> COMPOSITE </a>
+            <div>
+                <h2> IMAGE COMPOSITE </h2>
+                <p> 이미치를 합칩니다. </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class = "footer">
+        <a href="https://github.com/Matting-Team/MattingProject/wiki"> >>More Information << </a>
+        <h5>Copyright 2021. Gachon Univ. Dept of Software all rights reserved.</h5>
+    </div>
+</body>
+</html>

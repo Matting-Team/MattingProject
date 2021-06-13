@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MENU1</title>
+
+    <link rel="stylesheet" href="../static/CSS/layout.css?ver=1">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap" rel="stylesheet">
+
+    <!-- css -->
+    <link rel="stylesheet" type="text/css" href="https://fengyuanchen.github.io/cropperjs/css/cropper.css">
+    <!-- js -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://fengyuanchen.github.io/cropper/js/cropper.js"></script>
+
+    <style>
+        body {
+            font-family: 'Do Hyeon', sans-serif;
+        }
+        a:link{
+            color: #f2f2f2;
+            text-decoration: none;
+        }
+        a:visited{
+            color: #f2f2f2;
+            text-decoration: none;
+        }
+        a:hover{
+            color: #29407F;
+        }
+        img{
+            display: block; margin: 0px auto;
+        }
+
+        .photo_box{margin:0 auto ;max-width:700px;}
+        .upload_btn{overflow:hidden;width:100%;}
+        .upload_btn #photoBtn{display:none;}
+        .upload_btn .upload, .upload_btn a{float:left;width:calc(50% - 10px);text-align:center;text-decoration: none;color:#fff;padding:15px 0;}
+        .upload_btn .upload{background-color: #2e3449;}
+        .upload_btn a{margin-left:20px; background:#ccc;}
+        .photo_them{position:relative;margin-top:20px;width:100%;height:400px;background:#eee;}
+        .them_img, .result_box{position:absolute;top:0;left:0;width:100%;height:100%;}
+        .result_box{background:#fff;}
+        .them_img img, .result_box img{display:block;margin:0 auto;height:100%;}
+        #complete{display:block;margin-top:20px;padding:15px 0;width:100%;text-align:center;color:#fff;text-decoration: none;background-color: #2e3449;}
+    </style>
+</head>
+
+<body>
+    <div class = "header">
+        <h1 id="header">DEEP IMAGE MATTING</h1>
+        <p>Gachon Univ. Software Graduation Project</p>
+    </div>
+
+    <div class = "topnav">
+        <a href = "/home">  UPLOAD  </a>
+        <a href = "/composite">  COMPOSITION  </a>
+    </div>
+
+    <div class = "main">
+        <h2>IMAGE SELECTION</h2>
+        <hr>
+
+        <div class="photo_box">
+          <div class="upload_btn">
+            <div class="upload">
+                <input type="file" name="photoBtn" accept="image/jpeg, image/png" capture="camera" id="photoBtn"><label for="photoBtn">사진 첨부하기</label>
+            </div>
+            <a href="javascript:void(0);" id="resetPhoto">다시 올리기</a>
+          </div>
+
+          <div class="photo_them">
+            <div class="them_img">
+                <img id="image" src="">
+            </div>
+          </div>
+          <a href="javascript:void(0);" id="complete">업로드</a>
+        </div>
+    </div>
+
+    <div class = "footer">
+        <a href="https://github.com/Matting-Team/MattingProject/wiki"> >> More Information << </a>
+        <h5>Copyright 2021. Gachon Univ. Dept of Software all rights reserved.</h5>
+    </div>
+
+    <script>
+        window.onload = function(){
+            var header = document.getElementById("header");
+            header.onclick = function() {
+                location.href = "/";
+            }
+        }
+
+        $(function(){
+            var cropper;
+            // 사진 업로드 버튼
+            $('#photoBtn').on('change', function(){
+                $('.them_img').empty().append('<img id="image" src="">');
+                var image = $('#image');
+                var imgFile = $('#photoBtn').val();
+                var fileForm = /(.*?)\.(jpg|jpeg|png)$/;
+
+                // 이미지가 확장자 확인 후 노출
+                if(imgFile.match(fileForm)) {
+                    var reader = new FileReader();
+                    reader.onload = function(event) {
+                        image.attr("src", event.target.result);
+                        cropper = image.cropper( {
+                            dragMode: 'crop',
+                            viewMode:1,
+                            autoCropArea:1,
+                            restore: false,
+                            guides: true,
+                            center: false,
+                            highlight: false,
+                            cropBoxMovable: false,
+                            cropBoxResizable: true,
+                            toggleDragModeOnDblclick: false,
+                        });
+                    };
+                    reader.readAsDataURL(event.target.files[0]);
+                } else{
+                    alert("이미지 파일(jpg, png형식의 파일)만 올려주세요");
+                    $('#photoBtn').focus();
+                    return;
+                }
+            });
+            // 사진 다시 올리기 버튼
+            $('#resetPhoto').on('click', function(){
+                if($('input[type="file"]').val() != ""){
+                    $('#photoBtn').val('');
+                    $('.them_img img').attr('src','').remove();
+                    $('.btn_wrap a:last-child').removeClass('bg1');
+                    $('input[type="file"]').click();
+                }else{
+                    //alert('업로드된 사진이 없습니다.');
+                }
+            });
+            // Upload btn
+            $('#complete').on('click', function(){
+                $('.them_img').append('<div class="result_box"><img id="result" src=""></div>');
+                var image = $('#image');
+                var result = $('#result');
+                var canvas;
+                if($('input[type="file"]').val() != ""){
+                canvas = image.cropper('getCroppedCanvas',{
+                    width:500,
+                    height:500
+                });
+                result.attr('src',canvas.toDataURL("image/jpg"));
+
+                canvas.toBlob(function (blob) {
+                    var formData = new FormData();
+                    formData.append('img',blob,'image.jpg')
+                    $.ajax('/filePredict', {
+                        method: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        enctype: "multipart/form-data",
+                        success: function () {
+                            alert('업로드 성공');
+                            location.href ="/download";
+                        },
+                    });
+                })
+              }else{
+                  alert('사진을 업로드 해주세요');
+                  $('input[type="file"]').focus();
+                  return;
+              }
+            });
+        });
+    </script>
+</body>
+</html>
